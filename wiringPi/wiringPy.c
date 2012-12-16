@@ -35,6 +35,14 @@ static PyObject *wiringPy_setup(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", wiringPiSetup());
 }
 
+static PyObject *wiringPy_setupSys(PyObject *self, PyObject *args) {
+    return Py_BuildValue("i", wiringPiSetupSys());
+}
+
+static PyObject *wiringPy_setupGpio(PyObject *self, PyObject *args) {
+    return Py_BuildValue("i", wiringPiSetupGpio());
+}
+
 static PyObject *wiringPy_boardRevision(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", piBoardRev());
 }
@@ -138,6 +146,8 @@ static PyObject *wiringPy_pullUpDownControl(PyObject *self, PyObject *args) {
 
 static PyMethodDef WiringPyMethods[ ] = {
     { "setup",                (PyCFunction)wiringPy_setup,             METH_NOARGS,  "Must be called once at the start of your program execution." },
+    { "setup_sys",            (PyCFunction)wiringPy_setupSys,          METH_NOARGS,  "Must be called once at the start of your program execution." },
+    { "setup_gpio",           (PyCFunction)wiringPy_setupGpio,         METH_NOARGS,  "Must be called once at the start of your program execution." },
     { "board_revision",       (PyCFunction)wiringPy_boardRevision,     METH_NOARGS,  "Return a number representing the hardware revision of the board. Revision is currently 1 or 2. -1 is returned on error." },
     { "pin_mode",             (PyCFunction)wiringPy_pinMode,           METH_VARARGS, "Sets the mode of a pin to be input, output or PWM output." },
     { "digital_write",        (PyCFunction)wiringPy_digitalWrite,      METH_VARARGS, "Set an output bit." },
