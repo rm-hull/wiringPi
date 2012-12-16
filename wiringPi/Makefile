@@ -27,14 +27,16 @@ DYN_VERS_MIN=0
 VERSION=$(DYN_VERS_MAJ).$(DYN_VERS_MIN)
 DESTDIR=/usr
 PREFIX=/local
+PYTHON=python2.7
 
 STATIC=libwiringPi.a
 DYNAMIC=libwiringPi.so.$(VERSION)
+PYTHON_BINDINGS=wiringPy.so
 
 #DEBUG	= -g -O0
 DEBUG	= -O2
 CC	= gcc
-INCLUDE	= -I.
+INCLUDE	= -I. -I/usr/include/$(PYTHON)
 CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe -fPIC
 
 LIBS    =
@@ -50,8 +52,7 @@ SRC	=	wiringPi.c wiringPiFace.c wiringSerial.c wiringShift.c	\
 
 OBJ	=	$(SRC:.c=.o)
 
-all:		$(STATIC) $(DYNAMIC)
-#all:		$(DYNAMIC)
+all:		$(STATIC) $(DYNAMIC) $(PYTHON_BINDINGS)
 
 $(STATIC):	$(OBJ)
 	@echo "[Link (Static)]"
@@ -63,13 +64,19 @@ $(DYNAMIC):	$(OBJ)
 	@echo "[Link (Dynamic)]"
 	@$(CC) -shared -Wl,-soname,libwiringPi.so.1 -o libwiringPi.so.1.0 -lpthread $(OBJ)
 
+$(PYTHON_BINDINGS): $(OBJ)
+	@echo "[Python Bindings]"
+	@$(CC) $(CFLAGS) -fno-strict-aliasing -fwrapv -Wstrict-prototypes -c wiringPy.c
+	@$(CC) -pthread -shared -Wl,-soname,wiringPy.so -Bsymbolic-functions -o wiringPy.so -lpthread $(OBJ) wiringPy.o
+
 .c.o:
 	@echo [Compile] $<
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 .PHONEY:	clean
 clean:
-	rm -f $(OBJ) *~ core tags Makefile.bak libwiringPi.*
+	@echo [Clean]
+	@rm -f $(OBJ) *~ core tags Makefile.bak libwiringPi.* *.so *.o
 
 .PHONEY:	tags
 tags:	$(SRC)
@@ -93,6 +100,7 @@ install:	$(TARGET)
 	@install -m 0644 wiringPiSPI.h		$(DESTDIR)$(PREFIX)/include
 	@install -m 0755 libwiringPi.a		$(DESTDIR)$(PREFIX)/lib
 	@install -m 0755 libwiringPi.so.$(VERSION)		  $(DESTDIR)$(PREFIX)/lib
+	@install -m 0644 wiringPy.so		  $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
 	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION) $(DESTDIR)/lib/libwiringPi.so
 	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION) $(DESTDIR)/lib/libwiringPi.so.1
 	@ldconfig
@@ -111,6 +119,7 @@ uninstall:
 	@rm -f $(DESTDIR)$(PREFIX)/include/lcd.h
 	@rm -f $(DESTDIR)$(PREFIX)/include/wiringPiSPI.h
 	@rm -f $(DESTDIR)$(PREFIX)/lib/libwiringPi.*
+	@rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPi.so
 	@ldconfig
 
 
