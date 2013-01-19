@@ -49,6 +49,7 @@ SRC	=	wiringPi.c wiringPiFace.c wiringSerial.c wiringShift.c	\
 		piNes.c							\
 		lcd.c piHiPri.c piThread.c				\
 		wiringPiSPI.c 						\
+		bitBang.c 						\
 		softPwm.c softServo.c softTone.c
 
 OBJ	=	$(SRC:.c=.o)

@@ -24,6 +24,7 @@
 
 #include <Python.h>
 #include "wiringPi.h"
+#include "bitBang.h"
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
@@ -58,6 +59,14 @@ static PyObject *wiringPy_setupGpio(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", retval);
 }
 
+static PyObject *wiringPy_setupBitBang(PyObject *self, PyObject *args) {
+    const int device, csPin, diPin, clkPin, pulseDelay;
+    if (!PyArg_ParseTuple(args, "iiiii", &device, &csPin, &diPin, &clkPin, &pulseDelay)) return NULL;
+    int retval = setupBitBang(device, csPin, diPin, clkPin, pulseDelay);
+    if (wiringPiDebug) fprintf(stderr, "setupBitBang(%d, %d, %d, %d, %d) = %d\n", device, csPin, diPin, clkPin, pulseDelay, retval);
+    return Py_BuildValue("i", retval);
+}
+
 static PyObject *wiringPy_boardRevision(PyObject *self, PyObject *args) {
     int retval = piBoardRev();
     if (wiringPiDebug) fprintf(stderr, "piBoardRev() = %d\n", retval);
@@ -87,6 +96,15 @@ static PyObject *wiringPy_digitalWriteByte(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "i", &value)) return NULL;
     if (wiringPiDebug) fprintf(stderr, "digitalWriteByte(%d)\n", value);
     digitalWriteByte(value);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *wiringPy_digitalWriteSerial(PyObject *self, PyObject *args) {
+    const int device, data;
+    if (!PyArg_ParseTuple(args, "ii", &device, &data)) return NULL;
+    if (wiringPiDebug) fprintf(stderr, "digitalWriteSerial(%d,%d)\n", device, data);
+    digitalWriteSerial(device, data);
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -162,22 +180,24 @@ static PyObject *wiringPy_pullUpDownControl(PyObject *self, PyObject *args) {
 }
 
 static PyMethodDef WiringPyMethods[ ] = {
-    { "debug",                (PyCFunction)wiringPy_debug,             METH_VARARGS, "Sets debug log tracing on/off." },
-    { "setup",                (PyCFunction)wiringPy_setup,             METH_NOARGS,  "Must be called once at the start of your program execution." },
-    { "setup_sys",            (PyCFunction)wiringPy_setupSys,          METH_NOARGS,  "Must be called once at the start of your program execution." },
-    { "setup_gpio",           (PyCFunction)wiringPy_setupGpio,         METH_NOARGS,  "Must be called once at the start of your program execution." },
-    { "board_revision",       (PyCFunction)wiringPy_boardRevision,     METH_NOARGS,  "Return a number representing the hardware revision of the board. Revision is currently 1 or 2. -1 is returned on error." },
-    { "pin_mode",             (PyCFunction)wiringPy_pinMode,           METH_VARARGS, "Sets the mode of a pin to be input, output or PWM output." },
-    { "digital_write",        (PyCFunction)wiringPy_digitalWrite,      METH_VARARGS, "Set an output bit." },
-    { "digital_write_byte",   (PyCFunction)wiringPy_digitalWriteByte,  METH_VARARGS, "Write an 8-bit byte to the first 8 GPIO pins." },
-    { "digital_read",         (PyCFunction)wiringPy_digitalRead,       METH_VARARGS, "Read the value of a given Pin, returning HIGH or LOW." },
-    { "pwm_write",            (PyCFunction)wiringPy_pwmWrite,          METH_VARARGS, "Set an output PWM value." },
-    { "pwm_set_mode",         (PyCFunction)wiringPy_pwmSetMode,        METH_VARARGS, "Allow the user to control some of the PWM functions." },
-    { "pwm_set_range",        (PyCFunction)wiringPy_pwmSetRange,       METH_VARARGS, "." },
-    { "pwm_set_clock",        (PyCFunction)wiringPy_pwmSetClock,       METH_VARARGS, "Set/Change the PWM clock." },
-    { "set_pad_drive",        (PyCFunction)wiringPy_setPadDrive,       METH_VARARGS, "Set the PAD driver value." },
-    { "wait_for_interrupt",   (PyCFunction)wiringPy_waitForInterrupt,  METH_VARARGS, "Wait for Interrupt on a GPIO pin." },
-    { "pull_up_down_control", (PyCFunction)wiringPy_pullUpDownControl, METH_VARARGS, "Control the internal pull-up/down resistors on a GPIO pin." },
+    { "debug",                (PyCFunction)wiringPy_debug,              METH_VARARGS, "Sets debug log tracing on/off." },
+    { "setup",                (PyCFunction)wiringPy_setup,              METH_NOARGS,  "Must be called once at the start of your program execution." },
+    { "setup_sys",            (PyCFunction)wiringPy_setupSys,           METH_NOARGS,  "Must be called once at the start of your program execution." },
+    { "setup_gpio",           (PyCFunction)wiringPy_setupGpio,          METH_NOARGS,  "Must be called once at the start of your program execution." },
+    { "setup_bitbang",        (PyCFunction)wiringPy_setupBitBang,       METH_VARARGS, "Must be called once at the start of your program execution if using digital_write_serial." },
+    { "board_revision",       (PyCFunction)wiringPy_boardRevision,      METH_NOARGS,  "Return a number representing the hardware revision of the board. Revision is currently 1 or 2. -1 is returned on error." },
+    { "pin_mode",             (PyCFunction)wiringPy_pinMode,            METH_VARARGS, "Sets the mode of a pin to be input, output or PWM output." },
+    { "digital_write",        (PyCFunction)wiringPy_digitalWrite,       METH_VARARGS, "Set an output bit." },
+    { "digital_write_byte",   (PyCFunction)wiringPy_digitalWriteByte,   METH_VARARGS, "Write an 8-bit byte to the first 8 GPIO pins." },
+    { "digital_write_serial", (PyCFunction)wiringPy_digitalWriteSerial, METH_VARARGS, "Bit-bangs the byte according to the CS/DI/CLK pins of the configured SPI device." },
+    { "digital_read",         (PyCFunction)wiringPy_digitalRead,        METH_VARARGS, "Read the value of a given Pin, returning HIGH or LOW." },
+    { "pwm_write",            (PyCFunction)wiringPy_pwmWrite,           METH_VARARGS, "Set an output PWM value." },
+    { "pwm_set_mode",         (PyCFunction)wiringPy_pwmSetMode,         METH_VARARGS, "Allow the user to control some of the PWM functions." },
+    { "pwm_set_range",        (PyCFunction)wiringPy_pwmSetRange,        METH_VARARGS, "." },
+    { "pwm_set_clock",        (PyCFunction)wiringPy_pwmSetClock,        METH_VARARGS, "Set/Change the PWM clock." },
+    { "set_pad_drive",        (PyCFunction)wiringPy_setPadDrive,        METH_VARARGS, "Set the PAD driver value." },
+    { "wait_for_interrupt",   (PyCFunction)wiringPy_waitForInterrupt,   METH_VARARGS, "Wait for Interrupt on a GPIO pin." },
+    { "pull_up_down_control", (PyCFunction)wiringPy_pullUpDownControl,  METH_VARARGS, "Control the internal pull-up/down resistors on a GPIO pin." },
     { NULL, NULL, 0, NULL }     /* Sentinel */
 };
 
