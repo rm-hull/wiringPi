@@ -67,6 +67,8 @@
 extern "C" {
 #endif
 
+extern int wiringPiDebug;
+
 // Basic wiringPi functions
 
 extern int  wiringPiSetup       (void) ;
@@ -115,3 +117,4 @@ extern unsigned int millis            (void) ;
 #ifdef __cplusplus
 }
 #endif
+
