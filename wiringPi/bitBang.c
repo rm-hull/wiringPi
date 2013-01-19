@@ -45,35 +45,60 @@ struct bitBangConfig
 
 struct bitBangConfig *config [MAX_DEVICES] ;
 
-int setupBitBang (int device, uint8_t csPin, uint8_t diPin, uint8_t clkPin, int pulseDelay)
+int setupBitBang (uint8_t csPin, uint8_t diPin, uint8_t clkPin, int pulseDelay)
 {
-  if (device < 0 || device > MAX_DEVICES) {
-    if (wiringPiDebug) fprintf(stderr, "setupBitBang: invalid device specified (%d)\n", device);
+  static int initialized = 0 ;
+  struct bitBangConfig *cfg ;
+  int i;
+  int cfgFd = -1;
+
+  if (initialized == 0)
+  {
+    initialized = 1 ;
+    for (i = 0 ; i < MAX_DEVICES ; ++i)
+      config [i] = NULL;
+  }
+
+  for (i = 0 ; i < MAX_DEVICES ; ++i)
+  {
+    if (config [i] == NULL)
+    {
+      cfgFd = i ;
+      break ;
+    }
+  }
+
+  cfg = malloc (sizeof (struct bitBangConfig)) ;
+  if (cfg == NULL)
+  {
+    if (wiringPiDebug) fprintf(stderr, "setupBitBang: cannot malloc %d bytes\n", sizeof(struct bitBangConfig));
     return -1;
   }
 
-  struct bitBangConfig *cfg = config[device];
-  cfg->csPin = csPin;
-  cfg->diPin = diPin;
-  cfg->clkPin = clkPin;
-  cfg->pulseDelay = pulseDelay;
+  cfg->csPin = csPin ;
+  cfg->diPin = diPin ;
+  cfg->clkPin = clkPin ;
+  cfg->pulseDelay = pulseDelay ;
 
-  return 0;
+  config [cfgFd] = cfg ;
+
+  return cfgFd ;
 }
 
 // transmit byte serially, MSB first
-void digitalWriteSerial (int device, uint8_t data)
+void digitalWriteSerial (int fd, uint8_t data)
 {
-  if (device < 0 || device > MAX_DEVICES) {
-    if (wiringPiDebug) fprintf(stderr, "digitalWriteSerial: invalid device specified (%d)\n", device);
+  if (fd < 0 || fd > MAX_DEVICES || config [fd] == NULL)
+  {
+    if (wiringPiDebug) fprintf(stderr, "digitalWriteSerial: invalid fd specified (%d)\n", fd);
     return;
   }
 
   int i;
-  struct bitBangConfig *cfg = config[device];
+  struct bitBangConfig *cfg = config [fd];
 
   // select device
-  digitalWrite (cfg->csPin, 1) ;
+  digitalWrite (cfg->csPin, 0) ;    // Enable is low: TODO make this in config
 
   // send bits 7..0
   for (i = 0; i < 8; i++)

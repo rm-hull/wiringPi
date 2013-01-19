@@ -60,10 +60,10 @@ static PyObject *wiringPy_setupGpio(PyObject *self, PyObject *args) {
 }
 
 static PyObject *wiringPy_setupBitBang(PyObject *self, PyObject *args) {
-    const int device, csPin, diPin, clkPin, pulseDelay;
-    if (!PyArg_ParseTuple(args, "iiiii", &device, &csPin, &diPin, &clkPin, &pulseDelay)) return NULL;
-    int retval = setupBitBang(device, csPin, diPin, clkPin, pulseDelay);
-    if (wiringPiDebug) fprintf(stderr, "setupBitBang(%d, %d, %d, %d, %d) = %d\n", device, csPin, diPin, clkPin, pulseDelay, retval);
+    const int csPin, diPin, clkPin, pulseDelay;
+    if (!PyArg_ParseTuple(args, "iiii", &csPin, &diPin, &clkPin, &pulseDelay)) return NULL;
+    int retval = setupBitBang(csPin, diPin, clkPin, pulseDelay);
+    if (wiringPiDebug) fprintf(stderr, "setupBitBang(%d, %d, %d, %d) = %d\n", csPin, diPin, clkPin, pulseDelay, retval);
     return Py_BuildValue("i", retval);
 }
 

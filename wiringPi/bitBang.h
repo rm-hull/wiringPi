@@ -28,9 +28,9 @@
 extern "C" {
 #endif
 
-extern int setupBitBang (int device, uint8_t csPin, uint8_t diPin, uint8_t clkPin, int pulseDelay) ;
+extern int setupBitBang (uint8_t csPin, uint8_t diPin, uint8_t clkPin, int pulseDelay) ;
 
-extern void digitalWriteSerial (int device, uint8_t data) ;
+extern void digitalWriteSerial (int fd, uint8_t data) ;
 
 #ifdef __cplusplus
 }
