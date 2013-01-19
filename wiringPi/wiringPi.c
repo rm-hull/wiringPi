@@ -1232,6 +1232,9 @@ int wiringPiSetup (void)
 int wiringPiSetupGpio (void)
 {
   int x  ;
+  
+  if (getenv ("WIRINGPI_DEBUG") != NULL)
+    wiringPiDebug = TRUE ;
 
   if (wiringPiDebug)
     printf ("wiringPi: wiringPiSetupGpio called\n") ;
@@ -1271,6 +1274,9 @@ int wiringPiSetupSys (void)
   int pin ;
   struct timeval tv ;
   char fName [128] ;
+
+  if (getenv ("WIRINGPI_DEBUG") != NULL)
+    wiringPiDebug = TRUE ;  
 
   if (wiringPiDebug)
     printf ("wiringPi: wiringPiSetupSys called\n") ;
