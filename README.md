@@ -38,14 +38,13 @@ Building and installing
 -----------------------
 Ensure that the python headers are installed:
 
-    sudo apt-get install python-dev
+    sudo apt-get install python-dev libi2c-dev
 
-Assuming you've downloaded into ~/wiringPi:
+Assuming you've cloned/downloaded into ~/wiringPi:
 
-    cd ~/wiringPi/wiringPi
-    make clean all
-    sudo make install
-
+    cd ~/wiringPi
+    sudo build
+ 
 This will install all the (existing) wiringPi headers and libraries in
 `/usr/local/include` and `/usr/local/lib`, but will also install the
 self contained python bindings to `/usr/lib/python2.7/lib-dynload`.
