@@ -1,4 +1,4 @@
-#
+# ;
 # Makefile:
 #	wiringPi - Wiring Compatable library for the Raspberry Pi
 #
@@ -47,12 +47,15 @@ LIBS    =
 SRC	=	wiringPi.c wiringPiFace.c wiringSerial.c wiringShift.c	\
 		gertboard.c						\
 		piNes.c							\
-		lcd.c piHiPri.c piThread.c wiringPiSPI.c		\
+		lcd.c piHiPri.c piThread.c				\
+		wiringPiSPI.c wiringPiI2C.c 				\
 		softPwm.c softServo.c softTone.c
 
 OBJ	=	$(SRC:.c=.o)
 
-all:		$(STATIC) $(DYNAMIC) $(PYTHON_BINDINGS)
+all:		$(DYNAMIC) $(PYTHON_BINDINGS)
+
+static:		$(STATIC)
 
 $(STATIC):	$(OBJ)
 	@echo "[Link (Static)]"
@@ -84,7 +87,7 @@ tags:	$(SRC)
 	@ctags $(SRC)
 
 .PHONEY:	install
-install:	$(TARGET)
+install:	$(DYNAMIC)
 	@echo "[Install]"
 	@install -m 0755 -d			$(DESTDIR)$(PREFIX)/lib
 	@install -m 0755 -d			$(DESTDIR)$(PREFIX)/include
@@ -98,12 +101,17 @@ install:	$(TARGET)
 	@install -m 0644 softTone.h		$(DESTDIR)$(PREFIX)/include
 	@install -m 0644 lcd.h			$(DESTDIR)$(PREFIX)/include
 	@install -m 0644 wiringPiSPI.h		$(DESTDIR)$(PREFIX)/include
-	@install -m 0755 libwiringPi.a		$(DESTDIR)$(PREFIX)/lib
+	@install -m 0644 wiringPiI2C.h		$(DESTDIR)$(PREFIX)/include
 	@install -m 0755 libwiringPi.so.$(VERSION)		  $(DESTDIR)$(PREFIX)/lib
 	@install -m 0644 wiringPy.so		  $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
 	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION) $(DESTDIR)/lib/libwiringPi.so
 	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION) $(DESTDIR)/lib/libwiringPi.so.1
 	@ldconfig
+
+.PHONEY:	install-static
+install-static:	$(STATIC)
+	@echo "[Install Static]"
+	@install -m 0755 libwiringPi.a		$(DESTDIR)$(PREFIX)/lib
 
 .PHONEY:	uninstall
 uninstall:
@@ -118,6 +126,7 @@ uninstall:
 	@rm -f $(DESTDIR)$(PREFIX)/include/softTone.h
 	@rm -f $(DESTDIR)$(PREFIX)/include/lcd.h
 	@rm -f $(DESTDIR)$(PREFIX)/include/wiringPiSPI.h
+	@rm -f $(DESTDIR)$(PREFIX)/include/wiringPiI2C.h
 	@rm -f $(DESTDIR)$(PREFIX)/lib/libwiringPi.*
 	@rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPi.so
 	@ldconfig
