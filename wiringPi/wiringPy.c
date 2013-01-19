@@ -31,45 +31,43 @@
 
 static PyObject *WiringPyError;
 
-static int debug = 0;
-
 static PyObject *wiringPy_debug(PyObject *self, PyObject *args) {
     const int flag;
     if (!PyArg_ParseTuple(args, "i", &flag)) return NULL;
-    debug = flag;
-    if (debug) fprintf(stderr, "debug(%d)\n", debug);
+    wiringPiDebug = flag;
+    if (wiringPiDebug) fprintf(stderr, "debug(%d)\n", wiringPiDebug);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject *wiringPy_setup(PyObject *self, PyObject *args) {
     int retval = wiringPiSetup();
-    if (debug) fprintf(stderr, "wiringPiSetup() = %d\n", retval);
+    if (wiringPiDebug) fprintf(stderr, "wiringPiSetup() = %d\n", retval);
     return Py_BuildValue("i", retval);
 }
 
 static PyObject *wiringPy_setupSys(PyObject *self, PyObject *args) {
     int retval = wiringPiSetupSys();
-    if (debug) fprintf(stderr, "wiringPiSetupSys() = %d\n", retval);
+    if (wiringPiDebug) fprintf(stderr, "wiringPiSetupSys() = %d\n", retval);
     return Py_BuildValue("i", retval);
 }
 
 static PyObject *wiringPy_setupGpio(PyObject *self, PyObject *args) {
     int retval = wiringPiSetupGpio();
-    if (debug) fprintf(stderr, "wiringPiSetupGpio() = %d\n", retval);
+    if (wiringPiDebug) fprintf(stderr, "wiringPiSetupGpio() = %d\n", retval);
     return Py_BuildValue("i", retval);
 }
 
 static PyObject *wiringPy_boardRevision(PyObject *self, PyObject *args) {
     int retval = piBoardRev();
-    if (debug) fprintf(stderr, "piBoardRev() = %d\n", retval);
+    if (wiringPiDebug) fprintf(stderr, "piBoardRev() = %d\n", retval);
     return Py_BuildValue("i", retval);
 }
 
 static PyObject *wiringPy_pinMode(PyObject *self, PyObject *args) {
     const int pin, mode;
     if (!PyArg_ParseTuple(args, "ii", &pin, &mode)) return NULL;
-    if (debug) fprintf(stderr, "pinMode(%d, %d)\n", pin, mode);
+    if (wiringPiDebug) fprintf(stderr, "pinMode(%d, %d)\n", pin, mode);
     pinMode(pin, mode);
     Py_INCREF(Py_None);
     return Py_None;
@@ -78,7 +76,7 @@ static PyObject *wiringPy_pinMode(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_digitalWrite(PyObject *self, PyObject *args) {
     const int pin, value;
     if (!PyArg_ParseTuple(args, "ii", &pin, &value)) return NULL;
-    if (debug) fprintf(stderr, "digitalWrite(%d, %d)\n", pin, value);
+    if (wiringPiDebug) fprintf(stderr, "digitalWrite(%d, %d)\n", pin, value);
     digitalWrite(pin, value);
     Py_INCREF(Py_None);
     return Py_None;
@@ -87,7 +85,7 @@ static PyObject *wiringPy_digitalWrite(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_digitalWriteByte(PyObject *self, PyObject *args) {
     const int value;
     if (!PyArg_ParseTuple(args, "i", &value)) return NULL;
-    if (debug) fprintf(stderr, "digitalWriteByte(%d)\n", value);
+    if (wiringPiDebug) fprintf(stderr, "digitalWriteByte(%d)\n", value);
     digitalWriteByte(value);
     Py_INCREF(Py_None);
     return Py_None;
@@ -97,14 +95,14 @@ static PyObject *wiringPy_digitalRead(PyObject *self, PyObject *args) {
     const int pin;
     if (!PyArg_ParseTuple(args, "i", &pin)) return NULL;
     int value = digitalRead(pin);
-    if (debug) fprintf(stderr, "digitalRead(%d) = %d\n", pin, value);
+    if (wiringPiDebug) fprintf(stderr, "digitalRead(%d) = %d\n", pin, value);
     return Py_BuildValue("i", value);
 }
 
 static PyObject *wiringPy_pwmWrite(PyObject *self, PyObject *args) {
     const int pin, value;
     if (!PyArg_ParseTuple(args, "ii", &pin, &value)) return NULL;
-    if (debug) fprintf(stderr, "pwmWrite(%d, %d)\n", pin, value);
+    if (wiringPiDebug) fprintf(stderr, "pwmWrite(%d, %d)\n", pin, value);
     pwmWrite(pin, value);
     Py_INCREF(Py_None);
     return Py_None;
@@ -113,7 +111,7 @@ static PyObject *wiringPy_pwmWrite(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_pwmSetMode(PyObject *self, PyObject *args) {
     const int mode;
     if (!PyArg_ParseTuple(args, "i", &mode)) return NULL;
-    if (debug) fprintf(stderr, "pwmSetMode(%d)\n", mode);
+    if (wiringPiDebug) fprintf(stderr, "pwmSetMode(%d)\n", mode);
     pwmSetMode(mode);
     Py_INCREF(Py_None);
     return Py_None;
@@ -122,7 +120,7 @@ static PyObject *wiringPy_pwmSetMode(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_pwmSetRange(PyObject *self, PyObject *args) {
     const unsigned int range;
     if (!PyArg_ParseTuple(args, "I", &range)) return NULL;
-    if (debug) fprintf(stderr, "pwmSetRange(%d)\n", range);
+    if (wiringPiDebug) fprintf(stderr, "pwmSetRange(%d)\n", range);
     pwmSetRange(range);
     Py_INCREF(Py_None);
     return Py_None;
@@ -131,7 +129,7 @@ static PyObject *wiringPy_pwmSetRange(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_pwmSetClock(PyObject *self, PyObject *args) {
     const int divisor;
     if (!PyArg_ParseTuple(args, "i", &divisor)) return NULL;
-    if (debug) fprintf(stderr, "pwmSetClock(%d)\n", divisor);
+    if (wiringPiDebug) fprintf(stderr, "pwmSetClock(%d)\n", divisor);
     pwmSetClock(divisor);
     Py_INCREF(Py_None);
     return Py_None;
@@ -140,7 +138,7 @@ static PyObject *wiringPy_pwmSetClock(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_setPadDrive(PyObject *self, PyObject *args) {
     const int group, value;
     if (!PyArg_ParseTuple(args, "ii", &group, &value)) return NULL;
-    if (debug) fprintf(stderr, "setPadDrive(%d, %d)\n", group, value);
+    if (wiringPiDebug) fprintf(stderr, "setPadDrive(%d, %d)\n", group, value);
     setPadDrive(group, value);
     Py_INCREF(Py_None);
     return Py_None;
@@ -149,7 +147,7 @@ static PyObject *wiringPy_setPadDrive(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_waitForInterrupt(PyObject *self, PyObject *args) {
     const int pin, ms;
     if (!PyArg_ParseTuple(args, "ii", &pin, &ms)) return NULL;
-    if (debug) fprintf(stderr, "waitForInterrupt(%d, %d)\n", pin, ms);
+    if (wiringPiDebug) fprintf(stderr, "waitForInterrupt(%d, %d)\n", pin, ms);
     int value = waitForInterrupt(pin, ms);
     return Py_BuildValue("i", value);
 }
@@ -157,7 +155,7 @@ static PyObject *wiringPy_waitForInterrupt(PyObject *self, PyObject *args) {
 static PyObject *wiringPy_pullUpDownControl(PyObject *self, PyObject *args) {
     const int pin, pud;
     if (!PyArg_ParseTuple(args, "ii", &pin, &pud)) return NULL;
-    if (debug) fprintf(stderr, "pullUpDnControl(%d, %d)\n", pin, pud);
+    if (wiringPiDebug) fprintf(stderr, "pullUpDnControl(%d, %d)\n", pin, pud);
     pullUpDnControl(pin, pud);
     Py_INCREF(Py_None);
     return Py_None;
