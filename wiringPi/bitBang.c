@@ -107,7 +107,7 @@ inline void serialize(struct bitBangConfig *cfg, uint8_t data)
 // transmit array bytes serially, MSB first
 void digitalWriteSerialArray (int fd, uint8_t *data, int size)
 {
-  if (fd < 0 || fd > MAX_DEVICES || config [fd] == NULL)
+  if (fd < 0 || fd >= MAX_DEVICES || config [fd] == NULL)
   {
     if (wiringPiDebug) fprintf(stderr, "digitalWriteSerialArray: invalid fd specified (%d)\n", fd);
     return;
