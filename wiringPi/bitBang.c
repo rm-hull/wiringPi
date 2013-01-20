@@ -1,8 +1,6 @@
 /*
  * bitBang.c:
  *	Software SPI.
- *	This is designed to drive the parallel interface LCD drivers
- *	based in the Hitachi HD44780U controller and compatables.
  *
  * Copyright (c) 2013 Richard Hull
  ***********************************************************************
