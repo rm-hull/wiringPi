@@ -32,6 +32,8 @@ extern int setupBitBang (uint8_t csPin, uint8_t diPin, uint8_t clkPin, int pulse
 
 extern void digitalWriteSerial (int fd, uint8_t data) ;
 
+extern void digitalWriteSerialArray (int fd, uint8_t *data, int size) ;
+
 #ifdef __cplusplus
 }
 #endif

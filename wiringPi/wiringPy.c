@@ -109,6 +109,16 @@ static PyObject *wiringPy_digitalWriteSerial(PyObject *self, PyObject *args) {
     return Py_None;
 }
 
+static PyObject *wiringPy_digitalWriteSerialArray(PyObject *self, PyObject *args) {
+    const int device, size;
+    uint8_t *data;
+    if (!PyArg_ParseTuple(args, "it#", &device, &data, &size)) return NULL;
+    if (wiringPiDebug) fprintf(stderr, "digitalWriteSerialiArray(%d, [...], %d)\n", device, size);
+    digitalWriteSerialArray(device, data, size);
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject *wiringPy_digitalRead(PyObject *self, PyObject *args) {
     const int pin;
     if (!PyArg_ParseTuple(args, "i", &pin)) return NULL;
@@ -190,6 +200,7 @@ static PyMethodDef WiringPyMethods[ ] = {
     { "digital_write",        (PyCFunction)wiringPy_digitalWrite,       METH_VARARGS, "Set an output bit." },
     { "digital_write_byte",   (PyCFunction)wiringPy_digitalWriteByte,   METH_VARARGS, "Write an 8-bit byte to the first 8 GPIO pins." },
     { "digital_write_serial", (PyCFunction)wiringPy_digitalWriteSerial, METH_VARARGS, "Bit-bangs the byte according to the CS/DI/CLK pins of the configured SPI device." },
+    { "digital_write_serial_array", (PyCFunction)wiringPy_digitalWriteSerialArray, METH_VARARGS, "Bit-bangs the data array according to the CS/DI/CLK pins of the configured SPI device." },
     { "digital_read",         (PyCFunction)wiringPy_digitalRead,        METH_VARARGS, "Read the value of a given Pin, returning HIGH or LOW." },
     { "pwm_write",            (PyCFunction)wiringPy_pwmWrite,           METH_VARARGS, "Set an output PWM value." },
     { "pwm_set_mode",         (PyCFunction)wiringPy_pwmSetMode,         METH_VARARGS, "Allow the user to control some of the PWM functions." },
