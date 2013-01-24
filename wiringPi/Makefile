@@ -52,7 +52,11 @@ SRC	=	wiringPi.c wiringPiFace.c wiringSerial.c wiringShift.c	\
 		bitBang.c 						\
 		softPwm.c softServo.c softTone.c
 
+SRC_I2C	=	wiringPiI2C.c
+
 OBJ	=	$(SRC:.c=.o)
+
+OBJ_I2C	=	$(SRC_I2C:.c=.o)
 
 all:		$(DYNAMIC) $(PYTHON_BINDINGS)
 
@@ -73,6 +77,10 @@ $(PYTHON_BINDINGS): $(OBJ)
 	@$(CC) $(CFLAGS) -fno-strict-aliasing -fwrapv -Wstrict-prototypes -c wiringPy.c
 	@$(CC) -pthread -shared -Wl,-soname,wiringPy.so -Bsymbolic-functions -o wiringPy.so -lpthread $(OBJ) wiringPy.o
 
+i2c:	$(OBJ) $(OBJ_I2C)
+	@echo "[Link (Dynamic + I2C)]"
+	@$(CC) -shared -Wl,-soname,libwiringPi.so.1 -o libwiringPi.so.1.0 -lpthread $(OBJ) $(OBJ_I2C)
+
 .c.o:
 	@echo [Compile] $<
 	@$(CC) -c $(CFLAGS) $< -o $@
@@ -80,7 +88,7 @@ $(PYTHON_BINDINGS): $(OBJ)
 .PHONEY:	clean
 clean:
 	@echo [Clean]
-	@rm -f $(OBJ) *~ core tags Makefile.bak libwiringPi.* *.so *.o
+	@rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak libwiringPi.* *.so *.o
 
 .PHONEY:	tags
 tags:	$(SRC)
@@ -135,7 +143,7 @@ uninstall:
 
 .PHONEY:	depend
 depend:
-	makedepend -Y $(SRC)
+	makedepend -Y $(SRC) $(SRC_I2C)
 
 # DO NOT DELETE
 
@@ -148,5 +156,8 @@ piNes.o: wiringPi.h piNes.h
 lcd.o: wiringPi.h lcd.h
 piHiPri.o: wiringPi.h
 piThread.o: wiringPi.h
-softPwm.o: wiringPi.h softPwm.h
 wiringPiSPI.o: wiringPiSPI.h
+softPwm.o: wiringPi.h softPwm.h
+softServo.o: wiringPi.h softServo.h
+softTone.o: wiringPi.h softTone.h
+wiringPiI2C.o: wiringPi.h wiringPiI2C.h
