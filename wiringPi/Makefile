@@ -77,7 +77,7 @@ $(PYTHON_BINDINGS): $(OBJ)
 	@$(CC) $(CFLAGS) -fno-strict-aliasing -fwrapv -Wstrict-prototypes -c wiringPy.c
 	@$(CC) -pthread -shared -Wl,-soname,wiringPy.so -Bsymbolic-functions -o wiringPy.so -lpthread $(OBJ) wiringPy.o
 
-i2c:	$(OBJ) $(OBJ_I2C)
+i2c:	$(OBJ) $(OBJ_I2C) $(PYTHON_BINDINGS)
 	@echo "[Link (Dynamic + I2C)]"
 	@$(CC) -shared -Wl,-soname,libwiringPi.so.1 -o libwiringPi.so.1.0 -lpthread $(OBJ) $(OBJ_I2C)
 
@@ -112,7 +112,7 @@ install:	$(DYNAMIC)
 	@install -m 0644 wiringPiSPI.h		$(DESTDIR)$(PREFIX)/include
 	@install -m 0644 wiringPiI2C.h		$(DESTDIR)$(PREFIX)/include
 	@install -m 0755 libwiringPi.so.$(VERSION)		  $(DESTDIR)$(PREFIX)/lib
-	@install -m 0644 wiringPy.so		  $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
+	@install -m 0644 wiringPy.so		  $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
 	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION) $(DESTDIR)/lib/libwiringPi.so
 	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION) $(DESTDIR)/lib/libwiringPi.so.1
 	@ldconfig
@@ -137,7 +137,8 @@ uninstall:
 	@rm -f $(DESTDIR)$(PREFIX)/include/wiringPiSPI.h
 	@rm -f $(DESTDIR)$(PREFIX)/include/wiringPiI2C.h
 	@rm -f $(DESTDIR)$(PREFIX)/lib/libwiringPi.*
-	@rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPi.so
+	@rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
+	@rm -f $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
 	@ldconfig
 
 

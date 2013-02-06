@@ -48,12 +48,13 @@ Ensure that the python headers are installed:
 
 Assuming you've cloned/downloaded into ~/wiringPi:
 
-    cd ~/wiringPi
-    sudo build
+    $ cd ~/wiringPi
+    $ build clean
+    $ build
  
 This will install all the (existing) wiringPi headers and libraries in
 `/usr/local/include` and `/usr/local/lib`, but will also install the
-self contained python bindings to `/usr/lib/python2.7/lib-dynload`.
+self contained python bindings to `/usr/local/lib/python2.7/dist-packages`.
 
 Testing
 -------
