@@ -1,4 +1,4 @@
-WiringPy
+WiringPi
 ========
 Python bindings for wiringPi. The following functions have been implemented:
 
@@ -49,8 +49,8 @@ Ensure that the python headers are installed:
 Assuming you've cloned/downloaded into ~/wiringPi:
 
     $ cd ~/wiringPi
-    $ build clean
-    $ build
+    $ ./build clean
+    $ ./build
  
 This will install all the (existing) wiringPi headers and libraries in
 `/usr/local/include` and `/usr/local/lib`, but will also install the
