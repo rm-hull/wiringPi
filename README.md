@@ -59,10 +59,10 @@ self contained python bindings to `/usr/local/lib/python2.7/dist-packages`.
 Testing
 -------
 As per using the wiringPi libraries, you must have superuser privileges
-so running any python program using wiringPy must either be prefixed with
+so running any python program using wiringPi must either be prefixed with
 `sudo` or somehow make /dev/mem available.
 
-    sudo python ~/wiringPi/examples/test.py
+    sudo python ~/wiringPi/examples/test1.py
 
 TODO
 ----
