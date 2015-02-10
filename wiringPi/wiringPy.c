@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern int wiringPiDebug;
 static PyObject *WiringPyError;
 
 static PyObject *wiringPy_debug(PyObject *self, PyObject *args) {

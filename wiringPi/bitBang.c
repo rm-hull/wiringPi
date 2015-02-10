@@ -30,6 +30,8 @@
 #include "wiringPi.h"
 #include "bitBang.h"
 
+extern int wiringPiDebug ;
+
 struct bitBangConfig
 {
   // pins

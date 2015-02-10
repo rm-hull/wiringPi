@@ -60,6 +60,7 @@ SRC	=	wiringPi.c						\
 HEADERS =	wiringPi.h						\
 		wiringSerial.h wiringShift.h				\
 		wiringPiSPI.h wiringPiI2C.h				\
+		bitBang.h						\
 		softPwm.h softTone.h					\
 		mcp23008.h mcp23016.h mcp23017.h			\
 		mcp23s08.h mcp23s17.h					\
