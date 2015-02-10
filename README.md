@@ -1,4 +1,4 @@
-WiringPy
+WiringPi
 ========
 Python bindings for wiringPi. The following functions have been implemented:
 
@@ -49,8 +49,8 @@ Ensure that the python headers are installed:
 Assuming you've cloned/downloaded into ~/wiringPi:
 
     $ cd ~/wiringPi
-    $ build clean
-    $ build
+    $ ./build clean
+    $ ./build
  
 This will install all the (existing) wiringPi headers and libraries in
 `/usr/local/include` and `/usr/local/lib`, but will also install the
@@ -59,10 +59,10 @@ self contained python bindings to `/usr/local/lib/python2.7/dist-packages`.
 Testing
 -------
 As per using the wiringPi libraries, you must have superuser privileges
-so running any python program using wiringPy must either be prefixed with
+so running any python program using wiringPi must either be prefixed with
 `sudo` or somehow make /dev/mem available.
 
-    sudo python ~/wiringPi/examples/test.py
+    sudo python ~/wiringPi/examples/test1.py
 
 TODO
 ----
