@@ -1,20 +1,7 @@
-# Object files
 *.o
-tags
-
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
 *.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-
+lib*.so.*
+*~
+debian-template/wiringPi
+debian-template/wiringpi-*.deb
 gpio/gpio

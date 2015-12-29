@@ -22,12 +22,18 @@
 #################################################################################
 
 VERSION=$(shell cat ../VERSION)
-DESTDIR=/usr
-PREFIX=/local
-PYTHON=python2.7
+DESTDIR?=/usr
+PREFIX?=/local
+
+LDCONFIG?=ldconfig
+
+ifneq ($V,1)
+Q ?= @
+endif
 
 STATIC=libwiringPi.a
 DYNAMIC=libwiringPi.so.$(VERSION)
+PYTHON=python2.7
 PYTHON_BINDINGS=wiringPy.so
 
 #DEBUG	= -g -O0
@@ -80,14 +86,14 @@ all:		$(DYNAMIC) $(PYTHON_BINDINGS)
 static:		$(STATIC)
 
 $(STATIC):	$(OBJ)
-	@echo "[Link (Static)]"
-	@ar rcs $(STATIC) $(OBJ)
-	@ranlib $(STATIC)
+	$Q echo "[Link (Static)]"
+	$Q ar rcs $(STATIC) $(OBJ)
+	$Q ranlib $(STATIC)
 #	@size   $(STATIC)
 
 $(DYNAMIC):	$(OBJ)
-	@echo "[Link (Dynamic)]"
-	@$(CC) -shared -Wl,-soname,libwiringPi.so -o libwiringPi.so.$(VERSION) -lpthread $(OBJ)
+	$Q echo "[Link (Dynamic)]"
+	$Q $(CC) -shared -Wl,-soname,libwiringPi.so$(WIRINGPI_SONAME_SUFFIX) -o libwiringPi.so.$(VERSION) -lpthread $(OBJ)
 
 $(PYTHON_BINDINGS): $(OBJ)
 	@echo "[Python Bindings]"
@@ -95,62 +101,61 @@ $(PYTHON_BINDINGS): $(OBJ)
 	@$(CC) -pthread -shared -Wl,-soname,wiringPy.so -Bsymbolic-functions -o wiringPy.so -lpthread $(OBJ) wiringPy.o
 
 .c.o:
-	@echo [Compile] $<
-	@$(CC) -c $(CFLAGS) $< -o $@
+	$Q echo [Compile] $<
+	$Q $(CC) -c $(CFLAGS) $< -o $@
 
 
 .PHONY:	clean
 clean:
-	@echo "[Clean]"
-	@rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak libwiringPi.* *.so *.o
+	$Q echo "[Clean]"
+	$Q rm -f $(OBJ) $(OBJ_I2C) *~ core tags Makefile.bak libwiringPi.* *.so *.o
 
 .PHONY:	tags
 tags:	$(SRC)
-	@echo [ctags]
-	@ctags $(SRC)
+	$Q echo [ctags]
+	$Q ctags $(SRC)
 
 
 .PHONY:	install
 install:	$(DYNAMIC)
-	@echo "[Install Headers]"
-	@install -m 0755 -d						$(DESTDIR)$(PREFIX)/include
-	@install -m 0644 $(HEADERS)					$(DESTDIR)$(PREFIX)/include
-	@echo "[Install Dynamic Lib]"
-	@install -m 0755 -d						$(DESTDIR)$(PREFIX)/lib
-	@install -m 0755 libwiringPi.so.$(VERSION)			$(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION)
-	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION)	$(DESTDIR)/lib/libwiringPi.so
-	@ldconfig
-	@echo "[Install Python bindings]"
-	@install -m 0644 wiringPy.so		  $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
-	@ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION) $(DESTDIR)/lib/libwiringPi.so.$(VERSION)
+	$Q echo "[Install Headers]"
+	$Q install -m 0755 -d						$(DESTDIR)$(PREFIX)/include
+	$Q install -m 0644 $(HEADERS)					$(DESTDIR)$(PREFIX)/include
+	$Q echo "[Install Dynamic Lib]"
+	$Q install -m 0755 -d						$(DESTDIR)$(PREFIX)/lib
+	$Q install -m 0755 libwiringPi.so.$(VERSION)			$(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION)
+	$Q ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION)	$(DESTDIR)/lib/libwiringPi.so
+	$Q $(LDCONFIG)
+	@Q echo "[Install Python bindings]"
+	@Q install -m 0644 wiringPy.so		                        $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
 
 .PHONY:	install-static
 install-static:	$(STATIC)
-	@echo "[Install Headers]"
-	@install -m 0755 -d						$(DESTDIR)$(PREFIX)/include
-	@install -m 0644 $(HEADERS)					$(DESTDIR)$(PREFIX)/include
-	@echo "[Install Static Lib]"
-	@install -m 0755 -d						$(DESTDIR)$(PREFIX)/lib
-	@install -m 0755 libwiringPi.a					$(DESTDIR)$(PREFIX)/lib
+	$Q echo "[Install Headers]"
+	$Q install -m 0755 -d						$(DESTDIR)$(PREFIX)/include
+	$Q install -m 0644 $(HEADERS)					$(DESTDIR)$(PREFIX)/include
+	$Q echo "[Install Static Lib]"
+	$Q install -m 0755 -d						$(DESTDIR)$(PREFIX)/lib
+	$Q install -m 0755 libwiringPi.a					$(DESTDIR)$(PREFIX)/lib
 
 .PHONY:	install-deb
 install-deb:	$(DYNAMIC)
-	@echo "[Install Headers: deb]"
-	@install -m 0755 -d							~/wiringPi/debian/wiringPi/usr/include
-	@install -m 0644 $(HEADERS)						~/wiringPi/debian/wiringPi/usr/include
-	@echo "[Install Dynamic Lib: deb]"
-	install -m 0755 -d							~/wiringPi/debian/wiringPi/usr/lib
-	install -m 0755 libwiringPi.so.$(VERSION)				~/wiringPi/debian/wiringPi/usr/lib/libwiringPi.so.$(VERSION)
-	ln -sf ~/wiringPi/debian/wiringPi/usr/lib/libwiringPi.so.$(VERSION)	~/wiringPi/debian/wiringPi/usr/lib/libwiringPi.so
+	$Q echo "[Install Headers: deb]"
+	$Q install -m 0755 -d							~/wiringPi/debian-template/wiringPi/usr/include
+	$Q install -m 0644 $(HEADERS)						~/wiringPi/debian-template/wiringPi/usr/include
+	$Q echo "[Install Dynamic Lib: deb]"
+	install -m 0755 -d							~/wiringPi/debian-template/wiringPi/usr/lib
+	install -m 0755 libwiringPi.so.$(VERSION)				~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so.$(VERSION)
+	ln -sf ~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so.$(VERSION)	~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so
 
 .PHONY:	uninstall
 uninstall:
-	@echo "[UnInstall]"
-	@cd $(DESTDIR)$(PREFIX)/include/ && rm -f $(HEADERS)
-	@cd $(DESTDIR)$(PREFIX)/lib/     && rm -f libwiringPi.*
-	@ldconfig
-	@rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
-	@rm -f $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
+	$Q echo "[UnInstall]"
+	$Q cd $(DESTDIR)$(PREFIX)/include/ && rm -f $(HEADERS)
+	$Q cd $(DESTDIR)$(PREFIX)/lib/     && rm -f libwiringPi.*
+	$Q $(LDCONFIG)
+	@Q rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
+	@Q rm -f $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
 
 
 .PHONY:	depend
