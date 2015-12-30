@@ -96,9 +96,9 @@ $(DYNAMIC):	$(OBJ)
 	$Q $(CC) -shared -Wl,-soname,libwiringPi.so$(WIRINGPI_SONAME_SUFFIX) -o libwiringPi.so.$(VERSION) -lpthread $(OBJ)
 
 $(PYTHON_BINDINGS): $(OBJ)
-	@echo "[Python Bindings]"
-	@$(CC) $(CFLAGS) -fno-strict-aliasing -fwrapv -Wstrict-prototypes -c wiringPy.c
-	@$(CC) -pthread -shared -Wl,-soname,wiringPy.so -Bsymbolic-functions -o wiringPy.so -lpthread $(OBJ) wiringPy.o
+	$Q echo "[Python Bindings]"
+	$Q $(CC) $(CFLAGS) -fno-strict-aliasing -fwrapv -Wstrict-prototypes -c wiringPy.c
+	$Q $(CC) -pthread -shared -Wl,-soname,wiringPy.so -Bsymbolic-functions -o wiringPy.so -lpthread $(OBJ) wiringPy.o
 
 .c.o:
 	$Q echo [Compile] $<
@@ -126,8 +126,8 @@ install:	$(DYNAMIC)
 	$Q install -m 0755 libwiringPi.so.$(VERSION)			$(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION)
 	$Q ln -sf $(DESTDIR)$(PREFIX)/lib/libwiringPi.so.$(VERSION)	$(DESTDIR)/lib/libwiringPi.so
 	$Q $(LDCONFIG)
-	@Q echo "[Install Python bindings]"
-	@Q install -m 0644 wiringPy.so		                        $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
+	$Q echo "[Install Python bindings]"
+	$Q install -m 0644 wiringPy.so		                        $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
 
 .PHONY:	install-static
 install-static:	$(STATIC)
@@ -144,9 +144,9 @@ install-deb:	$(DYNAMIC)
 	$Q install -m 0755 -d							~/wiringPi/debian-template/wiringPi/usr/include
 	$Q install -m 0644 $(HEADERS)						~/wiringPi/debian-template/wiringPi/usr/include
 	$Q echo "[Install Dynamic Lib: deb]"
-	install -m 0755 -d							~/wiringPi/debian-template/wiringPi/usr/lib
-	install -m 0755 libwiringPi.so.$(VERSION)				~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so.$(VERSION)
-	ln -sf ~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so.$(VERSION)	~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so
+	$Q install -m 0755 -d							~/wiringPi/debian-template/wiringPi/usr/lib
+	$Q install -m 0755 libwiringPi.so.$(VERSION)				~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so.$(VERSION)
+	$Q ln -sf ~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so.$(VERSION)	~/wiringPi/debian-template/wiringPi/usr/lib/libwiringPi.so
 
 .PHONY:	uninstall
 uninstall:
@@ -154,8 +154,8 @@ uninstall:
 	$Q cd $(DESTDIR)$(PREFIX)/include/ && rm -f $(HEADERS)
 	$Q cd $(DESTDIR)$(PREFIX)/lib/     && rm -f libwiringPi.*
 	$Q $(LDCONFIG)
-	@Q rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
-	@Q rm -f $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
+	$Q rm -f $(DESTDIR)/lib/$(PYTHON)/lib-dynload/wiringPy.so
+	$Q rm -f $(DESTDIR)$(PREFIX)/lib/$(PYTHON)/dist-packages/wiringPy.so
 
 
 .PHONY:	depend
