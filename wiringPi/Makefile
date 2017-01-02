@@ -41,9 +41,9 @@ DEBUG	= -O2
 CC	= gcc
 INCLUDE	= -I. -I/usr/include/$(PYTHON)
 DEFS	= -D_GNU_SOURCE
-CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Winline $(INCLUDE) -pipe -fPIC
+CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Wextra -Winline $(INCLUDE) -pipe -fPIC
 
-LIBS    =
+LIBS    = -lm -lpthread -lrt
 
 ###############################################################################
 
@@ -60,7 +60,9 @@ SRC	=	wiringPi.c						\
 		mcp3002.c mcp3004.c mcp4802.c mcp3422.c			\
 		max31855.c max5322.c ads1115.c				\
 		sn3218.c						\
+		bmp180.c htu21d.c ds18b20.c				\
 		drcSerial.c						\
+		pseudoPins.c						\
 		wpiExtensions.c
 
 HEADERS =	wiringPi.h						\
@@ -78,7 +80,6 @@ HEADERS =	wiringPi.h						\
 		drcSerial.h						\
 		wpiExtensions.h 
 
-
 OBJ	=	$(SRC:.c=.o)
 
 all:		$(DYNAMIC) $(PYTHON_BINDINGS)
@@ -93,7 +94,7 @@ $(STATIC):	$(OBJ)
 
 $(DYNAMIC):	$(OBJ)
 	$Q echo "[Link (Dynamic)]"
-	$Q $(CC) -shared -Wl,-soname,libwiringPi.so$(WIRINGPI_SONAME_SUFFIX) -o libwiringPi.so.$(VERSION) -lpthread $(OBJ)
+	$Q $(CC) -shared -Wl,-soname,libwiringPi.so$(WIRINGPI_SONAME_SUFFIX) -o libwiringPi.so.$(VERSION) $(LIBS) $(OBJ)
 
 $(PYTHON_BINDINGS): $(OBJ)
 	$Q echo "[Python Bindings]"
@@ -187,9 +188,13 @@ mcp4802.o: wiringPi.h wiringPiSPI.h mcp4802.h
 mcp3422.o: wiringPi.h wiringPiI2C.h mcp3422.h
 max31855.o: wiringPi.h wiringPiSPI.h max31855.h
 max5322.o: wiringPi.h wiringPiSPI.h max5322.h
+ads1115.o: wiringPi.h wiringPiI2C.h ads1115.h
 sn3218.o: wiringPi.h wiringPiI2C.h sn3218.h
+bmp180.o: wiringPi.h wiringPiI2C.h bmp180.h
+htu21d.o: wiringPi.h wiringPiI2C.h htu21d.h
+ds18b20.o: wiringPi.h ds18b20.h
 drcSerial.o: wiringPi.h wiringSerial.h drcSerial.h
 wpiExtensions.o: wiringPi.h mcp23008.h mcp23016.h mcp23017.h mcp23s08.h
 wpiExtensions.o: mcp23s17.h sr595.h pcf8574.h pcf8591.h mcp3002.h mcp3004.h
-wpiExtensions.o: mcp4802.h mcp3422.h max31855.h max5322.h sn3218.h
-wpiExtensions.o: drcSerial.h wpiExtensions.h
+wpiExtensions.o: mcp4802.h mcp3422.h max31855.h max5322.h ads1115.h sn3218.h
+wpiExtensions.o: drcSerial.h bmp180.h htu21d.h ds18b20.h wpiExtensions.h
