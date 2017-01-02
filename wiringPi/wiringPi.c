@@ -1207,8 +1207,6 @@ void gpioClockSet (int pin, int freq)
     pin = physToGpio [pin] ;
   else if (wiringPiMode != WPI_MODE_GPIO)
     return ;
-  if (RASPBERRY_PI_PERI_BASE == 0)	// Ignore for now
-    return ;
 
   divi = 19200000 / freq ;
   divr = 19200000 % freq ;
